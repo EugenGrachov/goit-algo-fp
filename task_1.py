@@ -57,73 +57,98 @@ class LinkedList:
     def print_list(self):
         current = self.head
         while current:
-            print(current.data, "-->", end="")
+            print(current.data, end=" -> " if current.next else "\n")
             current = current.next
-        print('None')
 
-    def reverse(self):
-        #TODO Реалізувати метод реверсування однозв'язного списку, змінюючи посилання між вузлами
-        # 1 -> 2 - 3 => 3 -> 2 -> 1
-        pass
+    def reverse_linked_list(self):
+        prev = None
+        current = self.head
+        while current:
+            next_node = current.next
+            current.next = prev
+            prev = current
+            current = next_node
+        self.head = prev
 
-    def merge_sort(self, head):
-        #TODO Реалізуавти метод сортування для однозв'язного списку (можна і не злиттям)
-        # 2 -> 1 -> 3 => 1 -> 2 -> 3
-        pass
+    # За завданням обрав сортування списку методом вставок
+    def insertion_sort(self):
+        sorted_list = None  
+        current = self.head
 
-    def get_middle(self, head):
-        #TODO Отримати елемент в середині однозв'язного списку. Не обов'язково
-        pass
+        while current:
+            next_node = current.next
+            if sorted_list is None or sorted_list.data >= current.data:
+                current.next = sorted_list
+                sorted_list = current
+            else:
+                sorted_current = sorted_list
+                while sorted_current.next and sorted_current.next.data < current.data:
+                    sorted_current = sorted_current.next
 
-    def sorted_merge(self, a, b):
-        result = None
+                current.next = sorted_current.next
+                sorted_current.next = current
+            current = next_node
+        self.head = sorted_list
 
-        if a is None:
-            return b
-        if b is None:
-            return a
+    @staticmethod
+    def merge_sorted_lists(list1: "LinkedList", list2: "LinkedList") -> "LinkedList":
+        merged_list = LinkedList()
+        node = Node() 
+        tail = node
 
-        if a.data <= b.data:
-            result = a
-            result.next = self.sorted_merge(a.next, b)
-        else:
-            result = b
-            result.next = self.sorted_merge(a, b.next)
+        current1 = list1.head
+        current2 = list2.head
 
-        return result
+        while current1 and current2:
+            if current1.data <= current2.data:
+                tail.next = current1
+                current1 = current1.next
+            else:
+                tail.next = current2
+                current2 = current2.next
+            tail = tail.next
 
-    def merge_sorted_lists(self, list1, list2):
-        #TODO Реалізувати метод, що об'єднує два відсортовані однозв'язні списки в один відсортований список
-        # 1 -> 2
-        # 1 -> 3
-        # Output: 1 -> 1 -> 2 -> 3
-        pass
+        if current1:
+            tail.next = current1
+        elif current2:
+            tail.next = current2
 
-if __name__ == '__main__':
+        merged_list.head = node.next
+        return merged_list
 
-    first_list = LinkedList()
 
-    first_list.insert_at_beginning(5)
-    first_list.insert_at_beginning(10)
-    first_list.insert_at_beginning(15)
-    first_list.insert_at_end(20)
-    first_list.insert_at_end(25)
-    print("Зв'язний список:")
-    first_list.print_list()
+# Приклад використання
+llist = LinkedList()
 
-    first_list.reverse()
-    print("Зв'язний список після реверсування :")
-    first_list.print_list()
+llist.insert_at_beginning(5)
+llist.insert_at_beginning(10)
+llist.insert_at_beginning(15)
+llist.insert_at_end(20)
+llist.insert_at_end(25)
 
-    first_list.head = first_list.merge_sort(first_list.head)
-    print("Зв'язний список відсортовано:")
-    first_list.print_list()
+print("Зв'язний список:")
+llist.print_list()
 
-    second_list = LinkedList()
-    first_list.insert_at_beginning(59)
-    first_list.insert_at_beginning(20)
-    first_list.insert_at_beginning(35)
+llist.reverse_linked_list()
+print("\nЗв'язний список після реверсування:")
+llist.print_list()
 
-    first_list.merge_sorted_lists(first_list, second_list)
-    print("Зв'язний список відсортовано та замерджено:")
-    first_list.print_list()
+llist.insertion_sort()
+print("\nВідсортований зв'язний список ( метод вставок ):")
+llist.print_list()
+
+
+llist1 = LinkedList()
+llist1.insert_at_end(1)
+llist1.insert_at_end(3)
+llist1.insert_at_end(5)
+
+llist2 = LinkedList()
+llist2.insert_at_end(2)
+llist2.insert_at_end(4)
+llist2.insert_at_end(6)
+
+
+merged_list = LinkedList.merge_sorted_lists(llist1, llist2)
+print("\nОб'єднані два відсортовані однозв'язні списки в один відсортований список:")
+merged_list.print_list()
