@@ -45,9 +45,18 @@ def draw_tree(tree_root):
 
 def build_heap_tree(heap, index=0):
     #TODO Реалізація функції побудови дерева бінарної купи
-    # left = i*2+1
-    # right = i*2+2
-    pass
+    if index >= len(heap):
+        return None
+
+    node = Node(heap[index])
+
+    left_index = 2 * index + 1
+    right_index = 2 * index + 2
+
+    node.left = build_heap_tree(heap, left_index)
+    node.right = build_heap_tree(heap, right_index)
+
+    return node
 
 
 if __name__ == '__main__':
