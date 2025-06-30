@@ -41,15 +41,29 @@ def draw_tree(tree_root, colors):
     nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=node_colors)
     plt.show()
 
+
 def build_heap_tree(heap, index=0):
     #TODO Реалізація функції побудови дерева бінарної купи (Взяти з попереднього завдання)
-    pass
+    if index >= len(heap):
+        return None
+    node = Node(heap[index])
+    node.left = build_heap_tree(heap, 2 * index + 1)
+    node.right = build_heap_tree(heap, 2 * index + 2)
+    return node
+
 
 def generate_color(step, total_steps):
     base_color = [135, 206, 250]
     #TODO Додати обрахунок відтінку кольору відповідно до послідовності його проходження
-    darken_factor = None
-    new_color = None
+    end_color = [220, 235, 255]
+
+    def interpolate(start, end, darken_factor):
+        return int(start + (end - start) * darken_factor)
+
+    darken_factor = step / max(total_steps - 1, 1)
+
+    new_color = [interpolate(base_color[i], end_color[i], darken_factor) for i in range(3)]
+
     return f'#{new_color[0]:02x}{new_color[1]:02x}{new_color[2]:02x}'
 
 
@@ -60,16 +74,39 @@ def dfs_visualize(root, total_steps):
     step = 0
 
     #TODO Реалізація алгоритму DFS
+    while stack:
+        node = stack.pop()
+        if node and node.id not in visited:
+            visited.add(node.id)
+            colors[node.id] = generate_color(step, total_steps)
+            step += 1
+
+            if node.right:
+                stack.append(node.right)
+            if node.left:
+                stack.append(node.left)
 
     return colors
 
 
-def bfs_visualize(root, total_steps=1):
-    visited, queue = set(), [root]
+def bfs_visualize(root, total_steps):
+    visited = set()
+    queue = [root]
     colors = {}
     step = 0
 
     #TODO Реалізація алгоритму BFS
+    while queue:
+        node = queue.pop(0)
+        if node and node.id not in visited:
+            visited.add(node.id)
+            colors[node.id] = generate_color(step, total_steps)
+            step += 1
+
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
 
     return colors
 
@@ -83,16 +120,12 @@ def count_nodes(node):
 if __name__ == '__main__':
     heap_list = [1, 3, 5, 7, 9, 2, 4, 34, 2, 1, 2]
     heapq.heapify(heap_list)
-    # Побудова дерева з купи
     heap_tree_root = build_heap_tree(heap_list)
 
-    # Обрахунок кількості кроків (вузлів)
     total_steps = count_nodes(heap_tree_root)
 
-    # DFS візуалізація
     dfs_colors = dfs_visualize(heap_tree_root, total_steps)
     draw_tree(heap_tree_root, dfs_colors)
 
-    # BFS візуалізація
     bfs_colors = bfs_visualize(heap_tree_root, total_steps)
     draw_tree(heap_tree_root, bfs_colors)
